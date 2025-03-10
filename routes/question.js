@@ -10,8 +10,10 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 router.post("/gemini", async (req, res) => {
   try {
-    // Define the prompt to request 5 questions with options and correct answers
-    const prompt = `Generate ${"5"} multiple-choice questions about ${"Java"} for beginners. Each question should have:
+    const { topic, level, noOfQuestions } = req.body;
+
+    // Define the prompt to request questions with options and correct answers
+    const prompt = `Generate ${noOfQuestions} multiple-choice questions about ${topic} for ${level}. Each question should have:
 - 4 options (a, b, c, d)
 - A correct answer
 Format the response as a JSON-like structure without using Markdown or code blocks. Example:
@@ -72,23 +74,20 @@ Format the response as a JSON-like structure without using Markdown or code bloc
     console.log("Structured Questions:", structuredQuestions);
 
     // Save questions to the database
-    const savedQuestions = await Question.insertMany(
-      structuredQuestions.map((q) => ({
-        testId: req.body.testId, // Assuming testId is passed in the request body
-        question: q.question,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-      }))
-    );
+    const savedQuestionSet = await Question.create({
+      topic,
+      level,
+      noOfQuestions,
+      questions: structuredQuestions, // Save the array of questions
+    });
 
-    res.json({ success: true, questions: savedQuestions });
+    res.json({ success: true, questionSet: savedQuestionSet });
 
   } catch (error) {
     console.error("❌ Error generating content:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 router.get("/questions", async (req, res) => {
   try {
