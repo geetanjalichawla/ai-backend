@@ -18,12 +18,16 @@ const connectDB = async () => {
 // Connect to MongoDB
 connectDB();
 
+
 app.use(
   cors({
-    origin: "http://localhost:5173", // Change this to your frontend URL
-    credentials: true, // Allow cookies to be sent
+    origin: "*", // Allows requests from any origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow common headers
+    credentials: true, // Enable cookies (if needed)
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api' , questionRoutes); 
