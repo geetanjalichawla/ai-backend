@@ -1,15 +1,21 @@
-import "dotenv/config";
-const express = require('"express"')
-import express from "express";
-import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import cookieParser from "cookie-parser";
-import cors from "cors";
+require('dotenv/config');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const questionRoutes = require('./routes/question');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+  } catch (error) {
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    process.exit(1); // Exit the process if connection fails
+  }
+};
+
+// Connect to MongoDB
 connectDB();
 
 app.use(
@@ -20,15 +26,10 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
+app.use('/api' , questionRoutes); 
 app.get("/", (req, res) => {
   res.send("Hello World! My name is " + process.env.PORT);
 });
-
-app.use("/api/users", userRoutes);
-app.use("/api/product", productRoutes);
-app.use("/api/order", orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

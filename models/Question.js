@@ -1,12 +1,10 @@
 const mongoose = require("mongoose");
 
 const questionSchema = new mongoose.Schema({
-  testId: { type: mongoose.Schema.Types.ObjectId, ref: "Test", required: true },
-  questionText: { type: String, required: true },
-  options: [{ type: String, required: true }], // Array of answer choices
-  correctAnswer: { type: String, required: true },
-  hint: { type: String }, // Optional hint provided by API
-  createdAt: { type: Date, default: Date.now }
+  question: { type: String, required: true }, // Single question string
+  options: { type: Object, required: true }, // Object with keys a, b, c, d
+  correctAnswer: { type: String, required: true }, // Correct answer key (e.g., "a", "b", etc.)
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("Question", questionSchema);
